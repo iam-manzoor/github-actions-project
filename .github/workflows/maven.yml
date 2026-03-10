@@ -43,7 +43,7 @@ jobs:
 
   test:
     runs-on: Linux # Shared-Runner provided by GitHub
-
+    needs: security-check
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
