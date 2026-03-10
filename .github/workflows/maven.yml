@@ -6,7 +6,7 @@ on:
 
 jobs:
   compile:
-    runs-on: ubuntu-latest # Shared-Runner provided by GitHub
+    runs-on: Linux # Shared-Runner provided by GitHub
 
     steps:
     - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
       run: mvn compile
 
   security-check:
-    runs-on: ubuntu-latest # Shared-Runner provided by GitHub
+    runs-on: self-hosted # Shared-Runner provided by GitHub
     needs: compile
 
     steps:
