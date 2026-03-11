@@ -68,6 +68,11 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn package
+    - name: UploadJob Airtifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-jar
+        path: target/*.jar #Upload JAR in this path
 
     - uses: actions/checkout@v4
       with:
@@ -86,5 +91,29 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-        
-        
+
+  build_docker_image_push:
+    runs-on: Linux # Shared-Runner provided by GitHub
+    needs: build_project_sonar_scan
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download JAR artifacts
+      uses: actions/download-artifacts@v4
+      with:
+        name: app-jar
+        path: app  # Destination container path for JAR
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ vars.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        tags: ${{ vars.DOCKERHUB_USERNAME }}/bankapp:latest
